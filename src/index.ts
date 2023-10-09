@@ -1,6 +1,10 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
+import { MongoClient } from "mongodb";
+import * as dotenv from "dotenv";
+dotenv.config();
+const { MONGODB_CLUSTER, MONGODB_USERNAME, MONGODB_PASSWORD } = process.env ?? {};
 
 const typeDefs = readFileSync("./schema.graphql", { encoding: "utf-8" });
 
@@ -22,6 +26,10 @@ const resolvers = {
       books: () => books,
    },
 };
+
+const mongoDBConnectionString = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}`;
+const database = new MongoClient(mongoDBConnectionString);
+const connection = await database.connect();
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
