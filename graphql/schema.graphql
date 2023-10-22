@@ -1,19 +1,57 @@
+scalar ObjectID
+scalar UserID
+scalar QuizId
+scalar QuestionID
+scalar AnswerID
+
 type Query {
-  books: [Book]
+   getUser(userId: String!): User
+   getAnything: [Icon]
+   requestQuiz(userId: String!, numQuestions: Int): Quiz
 }
 
-type Book {
-  title: String
-  author: String
+type Icon {
+   _id: ObjectID
+   type: String
+   base64: String
+   description: String
 }
 
-type AddBookMutationResponse {
-  code: String!
-  success: Boolean!
-  message: String!
-  book: Book
+type User {
+   _id: UserID
+   username: String
+}
+
+type Quiz {
+   _id: QuizId!
+   userId: UserID!
+   questions: [Question!]!
+   score: Int
+}
+
+type Question {
+   _id: QuestionID!
+   quizId: QuizId!
+}
+
+type Answer {
+   _id: AnswerID
+   questionId: QuestionID!
+   problemStatement: String
+   correct: Boolean
+}
+
+type AnswerMutationResponse {
+   userId: UserID
+   questionId: QuestionID!
+   correct: Boolean!
+   score: Int
+}
+
+input AnswerInput {
+   userId: UserID!
 }
 
 type Mutation {
-  addBook(title: String, author: String): AddBookMutationResponse
+   addAnswer(answer: AnswerInput): AnswerMutationResponse
 }
