@@ -1,8 +1,9 @@
-scalar ObjectID
-scalar UserID
+scalar ObjectId
+scalar UserId
 scalar QuizId
-scalar QuestionID
-scalar AnswerID
+scalar QuestionId
+scalar AnswerId
+scalar Date
 
 type Query {
    getUser(userId: String!): User
@@ -10,48 +11,50 @@ type Query {
    requestQuiz(userId: String!, numQuestions: Int): Quiz
 }
 
+type Mutation {
+   addAnswer(answer: AnswerInput): AnswerMutationResponse
+   getQuiz(userId: UserId): Quiz
+}
+
 type Icon {
-   _id: ObjectID
+   _id: ObjectId
    type: String
    base64: String
    description: String
 }
 
 type User {
-   _id: UserID
+   _id: UserId
    username: String
 }
 
 type Quiz {
    _id: QuizId!
-   userId: UserID!
-   questions: [Question!]!
+   userId: UserId!
+   questions: [Question]
    score: Int
+   createdAt: Date!
 }
 
 type Question {
-   _id: QuestionID!
+   _id: QuestionId!
    quizId: QuizId!
 }
 
 type Answer {
-   _id: AnswerID
-   questionId: QuestionID!
+   _id: AnswerId
+   questionId: QuestionId!
    problemStatement: String
    correct: Boolean
 }
 
 type AnswerMutationResponse {
-   userId: UserID
-   questionId: QuestionID!
+   userId: UserId
+   questionId: QuestionId!
    correct: Boolean!
    score: Int
 }
 
 input AnswerInput {
-   userId: UserID!
-}
-
-type Mutation {
-   addAnswer(answer: AnswerInput): AnswerMutationResponse
+   userId: UserId!
 }

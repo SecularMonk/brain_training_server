@@ -5,6 +5,7 @@ const text = { consonants: "BCDFGHJKLMNPQRSTVWXYZ", vowels: "AEIOU" };
 type QuestionInitialisationData = { value: number; valueName: string };
 
 export function createQuiz({ userId, numQuestions = 5 }: { userId: User["_id"]; numQuestions?: number }): Quiz {
+   console.log("creating new quiz")
    const questions: Question[] = [];
    const quizId = randomUUID();
    for (let i = 0; i < numQuestions; i++) {
@@ -15,6 +16,7 @@ export function createQuiz({ userId, numQuestions = 5 }: { userId: User["_id"]; 
       _id: quizId,
       userId,
       questions,
+      createdAt: new Date(),
    };
 }
 
