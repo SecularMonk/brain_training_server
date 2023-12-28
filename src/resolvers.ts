@@ -1,34 +1,37 @@
-// This is the file where our generated types live
-// (specified in our `codegen.yml` file)
-import { MutationResolvers, QueryResolvers } from "./__generated__/resolvers-types";
+import { MutationResolvers, QueryResolvers, UserResolvers } from "./__generated__/resolvers-types";
 import { dataSources } from "./index.ts";
-import { createQuiz } from "./quizzes/generateQuiz.ts";
-// import { Users } from "./users";
+import { generateNewUserQuiz } from "./quizzes/generateQuiz.ts";
+import { logger } from "./logger.ts";
 
-export const queryResolvers: QueryResolvers<typeof dataSources> = {
-   // getUser: (_, { userId }, { Users }) => {
-   //    return dataSources.Users.getUser(userId);
-   // },
-   // getAnything: (_, __, { Icons }) => {
-   //    return dataSources.Icons.findOne({});
-   // },
+export const queryResolvers: QueryResolvers<{ dataSources: typeof dataSources }> = {
+   getQuiz: async (_, { userId }, { dataSources }) => {
+      return dataSources.Quizzes.findOne({ userId }, { sort: { createdAt: -1 }, projection: { "questions.correctAnswer": false } });
+   },
+   getUser: async (_, { userId }, { dataSources }) => {
+      return dataSources.Users.findOne({ userId });
+   },
+   engagements: async (getUser, { userId }, { dataSources }) => {
+      return dataSources.Engagements.findOne({ userId });
+   },
+   matchWords: async (_, { word }, { dataSources }) => {
+      return dataSources.Dictionary.find({ word }).toArray();
+   },
+};
+
+export const userResolvers: UserResolvers<{ dataSources: typeof dataSources }> = {
+   engagements: async (user, __, { dataSources }) => {
+      console.log("fetching engagements...");
+      return dataSources.Engagements.findOne({ userId: user._id });
+   },
 };
 
 export const mutationResolvers: MutationResolvers<{ dataSources: typeof dataSources }> = {
-   addAnswer: (_, {}, __) => {
-      return { userId: "test", questionId: "string", correct: false };
+   createQuiz: async (_, { input }, { dataSources }) => {
+      const { userId, difficulty } = input ?? {};
+      await generateNewUserQuiz({ userId, quizzesDataSource: dataSources.Quizzes, dictionaryDataSource: dataSources.Dictionary, difficulty });
+      return dataSources.Quizzes.findOne({ userId }, { sort: { createdAt: -1 }, projection: { "questions.correctAnswer": false } });
    },
-   getQuiz: async (_, { userId }, { dataSources }) => {
-      console.log("getQuiz ran, userId: ", userId, "dataSources: ", dataSources);
-      const quiz = await dataSources.Quizzes.findOne({ userId });
-      const { createdAt } = quiz;
-      switch (createdAt) {
-         case true: {
-            return createQuiz({ userId });
-         }
-         // default: {
-         //    return quiz;
-         // }
-      }
+   submitAnswer: async (_, { answer }, { dataSources }) => {
+      return await dataSources.Answers.insertOne({ ...answer, createdAt: new Date() });
    },
 };

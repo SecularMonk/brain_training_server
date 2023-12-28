@@ -16,6 +16,7 @@ export type Scalars = {
   Float: { input: number; output: number; }
   AnswerId: { input: any; output: any; }
   Date: { input: any; output: any; }
+  Difficulty: { input: any; output: any; }
   ObjectId: { input: any; output: any; }
   QuestionId: { input: any; output: any; }
   QuizId: { input: any; output: any; }
@@ -24,21 +25,54 @@ export type Scalars = {
 
 export type Answer = {
   __typename?: 'Answer';
-  _id?: Maybe<Scalars['AnswerId']['output']>;
+  _id?: Maybe<Scalars['String']['output']>;
+  answerId: Scalars['AnswerId']['output'];
   correct?: Maybe<Scalars['Boolean']['output']>;
-  problemStatement?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['Date']['output']>;
   questionId: Scalars['QuestionId']['output'];
+  quizId: Scalars['QuizId']['output'];
+  userAnswer: Scalars['String']['output'];
+  userId: Scalars['UserId']['output'];
 };
 
 export type AnswerInput = {
+  answerId: Scalars['AnswerId']['input'];
+  createdAt?: InputMaybe<Scalars['Date']['input']>;
+  questionId: Scalars['QuestionId']['input'];
+  quizId: Scalars['QuizId']['input'];
+  userAnswer: Scalars['String']['input'];
   userId: Scalars['UserId']['input'];
 };
 
-export type AnswerMutationResponse = {
-  __typename?: 'AnswerMutationResponse';
-  correct: Scalars['Boolean']['output'];
-  questionId: Scalars['QuestionId']['output'];
-  score?: Maybe<Scalars['Int']['output']>;
+export type CreateQuizInput = {
+  difficulty?: InputMaybe<Scalars['Difficulty']['input']>;
+  userId: Scalars['UserId']['input'];
+};
+
+export type DictionaryWord = {
+  __typename?: 'DictionaryWord';
+  word: Scalars['String']['output'];
+};
+
+export type Engagements = {
+  __typename?: 'Engagements';
+  correctAnswer?: Maybe<Scalars['Int']['output']>;
+  lastActiveDay?: Maybe<Scalars['Date']['output']>;
+  numActiveDays?: Maybe<Scalars['Int']['output']>;
+  quizComplete?: Maybe<Scalars['Int']['output']>;
+  streakLength?: Maybe<Scalars['Int']['output']>;
+  totalAnswers?: Maybe<Scalars['Int']['output']>;
+  totalQuestions?: Maybe<Scalars['Int']['output']>;
+  totalQuizzes?: Maybe<Scalars['Int']['output']>;
+};
+
+export type Event = {
+  __typename?: 'Event';
+  answerId?: Maybe<Scalars['AnswerId']['output']>;
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  event?: Maybe<Scalars['String']['output']>;
+  questionId?: Maybe<Scalars['QuestionId']['output']>;
+  quizId?: Maybe<Scalars['QuizId']['output']>;
   userId?: Maybe<Scalars['UserId']['output']>;
 };
 
@@ -52,25 +86,37 @@ export type Icon = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addAnswer?: Maybe<AnswerMutationResponse>;
-  getQuiz?: Maybe<Quiz>;
+  createQuiz?: Maybe<Quiz>;
+  submitAnswer?: Maybe<Scalars['AnswerId']['output']>;
 };
 
 
-export type MutationAddAnswerArgs = {
+export type MutationCreateQuizArgs = {
+  input?: InputMaybe<CreateQuizInput>;
+};
+
+
+export type MutationSubmitAnswerArgs = {
   answer?: InputMaybe<AnswerInput>;
-};
-
-
-export type MutationGetQuizArgs = {
-  userId?: InputMaybe<Scalars['UserId']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  engagements?: Maybe<Engagements>;
   getAnything?: Maybe<Array<Maybe<Icon>>>;
+  getQuiz?: Maybe<Quiz>;
   getUser?: Maybe<User>;
-  requestQuiz?: Maybe<Quiz>;
+  matchWords?: Maybe<Array<Maybe<DictionaryWord>>>;
+};
+
+
+export type QueryEngagementsArgs = {
+  userId?: InputMaybe<Scalars['UserId']['input']>;
+};
+
+
+export type QueryGetQuizArgs = {
+  userId?: InputMaybe<Scalars['UserId']['input']>;
 };
 
 
@@ -79,29 +125,38 @@ export type QueryGetUserArgs = {
 };
 
 
-export type QueryRequestQuizArgs = {
-  numQuestions?: InputMaybe<Scalars['Int']['input']>;
-  userId: Scalars['String']['input'];
+export type QueryMatchWordsArgs = {
+  word?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Question = {
   __typename?: 'Question';
   _id: Scalars['QuestionId']['output'];
+  answered?: Maybe<Scalars['Boolean']['output']>;
+  availableAnswers: Array<Scalars['String']['output']>;
+  correct?: Maybe<Scalars['Boolean']['output']>;
+  correctAnswer?: Maybe<Scalars['String']['output']>;
+  options: Array<Scalars['String']['output']>;
+  problemStatement: Array<Scalars['String']['output']>;
+  question: Scalars['String']['output'];
   quizId: Scalars['QuizId']['output'];
+  userAnswer?: Maybe<Scalars['String']['output']>;
 };
 
 export type Quiz = {
   __typename?: 'Quiz';
   _id: Scalars['QuizId']['output'];
+  complete?: Maybe<Scalars['Boolean']['output']>;
   createdAt: Scalars['Date']['output'];
   questions?: Maybe<Array<Maybe<Question>>>;
-  score?: Maybe<Scalars['Int']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
   userId: Scalars['UserId']['output'];
 };
 
 export type User = {
   __typename?: 'User';
   _id?: Maybe<Scalars['UserId']['output']>;
+  engagements?: Maybe<Engagements>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -180,9 +235,14 @@ export type ResolversTypes = ResolversObject<{
   Answer: ResolverTypeWrapper<Answer>;
   AnswerId: ResolverTypeWrapper<Scalars['AnswerId']['output']>;
   AnswerInput: AnswerInput;
-  AnswerMutationResponse: ResolverTypeWrapper<AnswerMutationResponse>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CreateQuizInput: CreateQuizInput;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+  DictionaryWord: ResolverTypeWrapper<DictionaryWord>;
+  Difficulty: ResolverTypeWrapper<Scalars['Difficulty']['output']>;
+  Engagements: ResolverTypeWrapper<Engagements>;
+  Event: ResolverTypeWrapper<Event>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Icon: ResolverTypeWrapper<Icon>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -202,9 +262,14 @@ export type ResolversParentTypes = ResolversObject<{
   Answer: Answer;
   AnswerId: Scalars['AnswerId']['output'];
   AnswerInput: AnswerInput;
-  AnswerMutationResponse: AnswerMutationResponse;
   Boolean: Scalars['Boolean']['output'];
+  CreateQuizInput: CreateQuizInput;
   Date: Scalars['Date']['output'];
+  DictionaryWord: DictionaryWord;
+  Difficulty: Scalars['Difficulty']['output'];
+  Engagements: Engagements;
+  Event: Event;
+  Float: Scalars['Float']['output'];
   Icon: Icon;
   Int: Scalars['Int']['output'];
   Mutation: {};
@@ -220,10 +285,14 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type AnswerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Answer'] = ResolversParentTypes['Answer']> = ResolversObject<{
-  _id?: Resolver<Maybe<ResolversTypes['AnswerId']>, ParentType, ContextType>;
+  _id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  answerId?: Resolver<ResolversTypes['AnswerId'], ParentType, ContextType>;
   correct?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  problemStatement?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   questionId?: Resolver<ResolversTypes['QuestionId'], ParentType, ContextType>;
+  quizId?: Resolver<ResolversTypes['QuizId'], ParentType, ContextType>;
+  userAnswer?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['UserId'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -231,17 +300,40 @@ export interface AnswerIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'AnswerId';
 }
 
-export type AnswerMutationResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AnswerMutationResponse'] = ResolversParentTypes['AnswerMutationResponse']> = ResolversObject<{
-  correct?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  questionId?: Resolver<ResolversTypes['QuestionId'], ParentType, ContextType>;
-  score?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  userId?: Resolver<Maybe<ResolversTypes['UserId']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
 }
+
+export type DictionaryWordResolvers<ContextType = any, ParentType extends ResolversParentTypes['DictionaryWord'] = ResolversParentTypes['DictionaryWord']> = ResolversObject<{
+  word?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export interface DifficultyScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Difficulty'], any> {
+  name: 'Difficulty';
+}
+
+export type EngagementsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Engagements'] = ResolversParentTypes['Engagements']> = ResolversObject<{
+  correctAnswer?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  lastActiveDay?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  numActiveDays?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  quizComplete?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  streakLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalAnswers?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalQuestions?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalQuizzes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type EventResolvers<ContextType = any, ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']> = ResolversObject<{
+  answerId?: Resolver<Maybe<ResolversTypes['AnswerId']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  event?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  questionId?: Resolver<Maybe<ResolversTypes['QuestionId']>, ParentType, ContextType>;
+  quizId?: Resolver<Maybe<ResolversTypes['QuizId']>, ParentType, ContextType>;
+  userId?: Resolver<Maybe<ResolversTypes['UserId']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
 
 export type IconResolvers<ContextType = any, ParentType extends ResolversParentTypes['Icon'] = ResolversParentTypes['Icon']> = ResolversObject<{
   _id?: Resolver<Maybe<ResolversTypes['ObjectId']>, ParentType, ContextType>;
@@ -252,8 +344,8 @@ export type IconResolvers<ContextType = any, ParentType extends ResolversParentT
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  addAnswer?: Resolver<Maybe<ResolversTypes['AnswerMutationResponse']>, ParentType, ContextType, Partial<MutationAddAnswerArgs>>;
-  getQuiz?: Resolver<Maybe<ResolversTypes['Quiz']>, ParentType, ContextType, Partial<MutationGetQuizArgs>>;
+  createQuiz?: Resolver<Maybe<ResolversTypes['Quiz']>, ParentType, ContextType, Partial<MutationCreateQuizArgs>>;
+  submitAnswer?: Resolver<Maybe<ResolversTypes['AnswerId']>, ParentType, ContextType, Partial<MutationSubmitAnswerArgs>>;
 }>;
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
@@ -261,14 +353,24 @@ export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  engagements?: Resolver<Maybe<ResolversTypes['Engagements']>, ParentType, ContextType, Partial<QueryEngagementsArgs>>;
   getAnything?: Resolver<Maybe<Array<Maybe<ResolversTypes['Icon']>>>, ParentType, ContextType>;
+  getQuiz?: Resolver<Maybe<ResolversTypes['Quiz']>, ParentType, ContextType, Partial<QueryGetQuizArgs>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'userId'>>;
-  requestQuiz?: Resolver<Maybe<ResolversTypes['Quiz']>, ParentType, ContextType, RequireFields<QueryRequestQuizArgs, 'userId'>>;
+  matchWords?: Resolver<Maybe<Array<Maybe<ResolversTypes['DictionaryWord']>>>, ParentType, ContextType, Partial<QueryMatchWordsArgs>>;
 }>;
 
 export type QuestionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Question'] = ResolversParentTypes['Question']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['QuestionId'], ParentType, ContextType>;
+  answered?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  availableAnswers?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  correct?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  correctAnswer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  options?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  problemStatement?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  question?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   quizId?: Resolver<ResolversTypes['QuizId'], ParentType, ContextType>;
+  userAnswer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -278,9 +380,10 @@ export interface QuestionIdScalarConfig extends GraphQLScalarTypeConfig<Resolver
 
 export type QuizResolvers<ContextType = any, ParentType extends ResolversParentTypes['Quiz'] = ResolversParentTypes['Quiz']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['QuizId'], ParentType, ContextType>;
+  complete?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   questions?: Resolver<Maybe<Array<Maybe<ResolversTypes['Question']>>>, ParentType, ContextType>;
-  score?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  score?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['UserId'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -291,6 +394,7 @@ export interface QuizIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   _id?: Resolver<Maybe<ResolversTypes['UserId']>, ParentType, ContextType>;
+  engagements?: Resolver<Maybe<ResolversTypes['Engagements']>, ParentType, ContextType>;
   username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -302,8 +406,11 @@ export interface UserIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
 export type Resolvers<ContextType = any> = ResolversObject<{
   Answer?: AnswerResolvers<ContextType>;
   AnswerId?: GraphQLScalarType;
-  AnswerMutationResponse?: AnswerMutationResponseResolvers<ContextType>;
   Date?: GraphQLScalarType;
+  DictionaryWord?: DictionaryWordResolvers<ContextType>;
+  Difficulty?: GraphQLScalarType;
+  Engagements?: EngagementsResolvers<ContextType>;
+  Event?: EventResolvers<ContextType>;
   Icon?: IconResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
