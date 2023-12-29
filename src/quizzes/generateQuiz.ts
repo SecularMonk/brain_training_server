@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { dataSources } from "..";
 import { logger } from "../logger.ts";
 import { pickNumberFromDistribution, bindNumberToRange } from "../helpers.ts";
-import { generateFamilyFriendlyString } from "./familyFriendlyStrings.ts";
+import { generateSanitisedStrings } from "./familyFriendlyStrings.ts";
 
 const text = { consonants: "BCDFGHJKLMNPQRSTVWXYZ", vowels: "AEIOU" };
 type QuestionInitialisationData = { value: number; valueName: string };
@@ -29,7 +29,6 @@ export async function generateNewUserQuiz({
       const question = await createQuestion({ quizId, problemSize, dictionaryDataSource });
       questions.push(question);
    }
-   // console.log("QUESTIONS: ", questions);
 
    const quiz = {
       _id: quizId,
@@ -63,10 +62,10 @@ function getDifficultySettings(difficulty: Difficulty): DifficultySettings {
 async function generateStringsAndValues(numItems: number = 3, dictionaryDataSource: typeof dataSources.Dictionary) {
    try {
       const internalValues: QuestionInitialisationData[] = [];
+      const valueNames = await generateSanitisedStrings({ dataSource: dictionaryDataSource, numStrings: numItems });
       for (let i = 0, n = numItems; i < n; i++) {
-         const valueName = await generateFamilyFriendlyString({ dataSource: dictionaryDataSource });
          const value = Math.floor(Math.random() * 2);
-         internalValues.push({ value, valueName });
+         internalValues.push({ value, valueName: valueNames?.[i] });
       }
       return internalValues;
    } catch (error) {
