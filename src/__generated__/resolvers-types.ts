@@ -20,6 +20,7 @@ export type Scalars = {
   ObjectId: { input: any; output: any; }
   QuestionId: { input: any; output: any; }
   QuizId: { input: any; output: any; }
+  TransactionId: { input: any; output: any; }
   UserId: { input: any; output: any; }
 };
 
@@ -148,9 +149,18 @@ export type Quiz = {
   _id: Scalars['QuizId']['output'];
   complete?: Maybe<Scalars['Boolean']['output']>;
   createdAt: Scalars['Date']['output'];
+  difficulty: Scalars['Difficulty']['output'];
   questions?: Maybe<Array<Maybe<Question>>>;
+  rewards?: Maybe<Array<Maybe<Transaction>>>;
   score?: Maybe<Scalars['Float']['output']>;
   userId: Scalars['UserId']['output'];
+};
+
+export type Transaction = {
+  __typename?: 'Transaction';
+  _id?: Maybe<Scalars['TransactionId']['output']>;
+  rewardAmount?: Maybe<Scalars['Int']['output']>;
+  rewardType?: Maybe<Scalars['String']['output']>;
 };
 
 export type User = {
@@ -253,6 +263,8 @@ export type ResolversTypes = ResolversObject<{
   Quiz: ResolverTypeWrapper<Quiz>;
   QuizId: ResolverTypeWrapper<Scalars['QuizId']['output']>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Transaction: ResolverTypeWrapper<Transaction>;
+  TransactionId: ResolverTypeWrapper<Scalars['TransactionId']['output']>;
   User: ResolverTypeWrapper<User>;
   UserId: ResolverTypeWrapper<Scalars['UserId']['output']>;
 }>;
@@ -280,6 +292,8 @@ export type ResolversParentTypes = ResolversObject<{
   Quiz: Quiz;
   QuizId: Scalars['QuizId']['output'];
   String: Scalars['String']['output'];
+  Transaction: Transaction;
+  TransactionId: Scalars['TransactionId']['output'];
   User: User;
   UserId: Scalars['UserId']['output'];
 }>;
@@ -382,7 +396,9 @@ export type QuizResolvers<ContextType = any, ParentType extends ResolversParentT
   _id?: Resolver<ResolversTypes['QuizId'], ParentType, ContextType>;
   complete?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  difficulty?: Resolver<ResolversTypes['Difficulty'], ParentType, ContextType>;
   questions?: Resolver<Maybe<Array<Maybe<ResolversTypes['Question']>>>, ParentType, ContextType>;
+  rewards?: Resolver<Maybe<Array<Maybe<ResolversTypes['Transaction']>>>, ParentType, ContextType>;
   score?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['UserId'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -390,6 +406,17 @@ export type QuizResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export interface QuizIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['QuizId'], any> {
   name: 'QuizId';
+}
+
+export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = ResolversObject<{
+  _id?: Resolver<Maybe<ResolversTypes['TransactionId']>, ParentType, ContextType>;
+  rewardAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  rewardType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export interface TransactionIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['TransactionId'], any> {
+  name: 'TransactionId';
 }
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -419,6 +446,8 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   QuestionId?: GraphQLScalarType;
   Quiz?: QuizResolvers<ContextType>;
   QuizId?: GraphQLScalarType;
+  Transaction?: TransactionResolvers<ContextType>;
+  TransactionId?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
   UserId?: GraphQLScalarType;
 }>;
