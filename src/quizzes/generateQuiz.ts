@@ -34,6 +34,7 @@ export async function generateNewUserQuiz({
       _id: quizId,
       userId,
       questions,
+      difficulty,
       createdAt: new Date(),
    };
 
